@@ -23,7 +23,7 @@ exports.DashBoard = (req, res) => {
 
 exports.SignUp = async (req, res) => {
   let { name, email, mobile, password, gender } = req.body;
-  let hashed = await bcrypt.hash(password, 15);
+  let hashed = await bcrypt.hash(password, 1);
   email = email.toLowerCase();
   let admin_data = new admin({
     name,
