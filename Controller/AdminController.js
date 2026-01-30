@@ -2,6 +2,7 @@ let {admin} = require('../Schema/admin');
 let Teacher = require('../Schema/add_teacher');
 let bcrypt = require("bcryptjs");
 let multer = require("multer");
+const Student = require('../Schema/Add_New_Student');
 
 
 exports.ValidateAdmin = (req, res, next) => {
@@ -175,3 +176,84 @@ exports.RemoveTeacher = (req, res) => {
     });
   });
 };
+
+
+exports.GetStudents = async (req, res) => {
+  try {
+    let Students = await Student.find({ admin_id: req.session.admin_id });
+
+    if (!Students || Students.length === 0) {
+      return res.status(404).json({ message: "No students found" });
+    }
+
+    let Details = Students.map((stu) => ({
+      studentId : stu._id.toString(),
+      name: stu.name,
+      StudentImage: stu.StudentImage,
+      gender: stu.gender,
+      fatherName: stu.fatherName,
+      motherName: stu.motherName,
+      email: stu.email,
+      mobileNumber: stu.mobileNumber,
+      parentContact: stu.parentContact,
+      rollNumber: stu.rollNumber,
+      department: stu.department,
+    }));
+
+    return res.status(200).json({ students: Details });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.GetOneStudent = async (req,res) =>{
+  let id = req.params.id;
+  let Data = await Student.findById(id);
+  let StudentInfo = {name : Data.name,
+  gender : Data.gender,
+  StudentImage : Data.StudentImage,
+  fatherName : Data.fatherName,
+  motherName : Data.motherName,
+  email : Data.email,
+  mobileNumber : Data.mobileNumber,
+  parentContact : Data.parentContact,
+  rollNumber : Data.rollNumber,
+  department : Data.department,
+  }
+
+ return res.status(200).json(StudentInfo);
+
+}
+
+exports.RemoveStudent = async (req,res) => {
+  let id = req.params.id;
+  
+ await Student.findByIdAndDelete(id);
+  try {
+    let Students = await Student.find({ admin_id: req.session.admin_id });
+
+    if (!Students || Students.length === 0) {
+      return res.status(404).json({ message: "No students found" });
+    }
+
+    let Details = Students.map((stu) => ({
+      studentId: stu._id.toString(),
+      name: stu.name,
+      StudentImage: stu.StudentImage,
+      gender: stu.gender,
+      fatherName: stu.fatherName,
+      motherName: stu.motherName,
+      email: stu.email,
+      mobileNumber: stu.mobileNumber,
+      parentContact: stu.parentContact,
+      rollNumber: stu.rollNumber,
+      department: stu.department,
+    }));
+
+    return res.status(200).json({ students: Details });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
